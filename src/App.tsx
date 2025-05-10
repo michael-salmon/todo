@@ -1,35 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Fragment, useState, type ChangeEvent, type KeyboardEvent } from 'react';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+	const [toDos, setTodos] = useState<string[]>([]);
+	const [newTodo, setNewTodo] = useState('');
+	const [done, setDone] = useState<boolean[]>([]);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	const handleTodoUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+		const { target: { value } } = event;
+		setNewTodo(value);
+	}
+	
+	const handleOnCheck = (index: number) => () => {
+		setDone(prev => {
+			const temp = [...prev];
+			temp[index] = !prev[index];
+			return temp;
+		})
+	}
+	
+	const handleOnClick = () => {
+		setTodos(prev => [...prev, newTodo]);
+		setDone(prev => [...prev, false]);
+		setNewTodo('');
+	}
+
+	const handleOnDelete = (index: number) => () => {
+		setTodos(prev =>  prev.toSpliced(index, 1));
+		setDone(prev => prev.toSpliced(index, 1));
+	}
+
+	const onEnter = ({ code }: KeyboardEvent<HTMLInputElement>) => {
+		if (code === 'Enter') handleOnClick();
+	}
+
+	return (
+		<>
+			<div>
+				<input type='text' value={newTodo} onChange={handleTodoUpdate} onKeyDown={onEnter} />
+				<button onClick={handleOnClick} disabled={!newTodo.length}>Add ➕</button>
+				<div>
+					{toDos.map((x, i) => (
+						<Fragment key={x+i}>
+							<input type='checkbox' onClick={handleOnCheck(i)} />
+							<text style={done[i] ? { textDecoration: 'line-through' } : {}}>{x}</text>
+							<button onClick={handleOnDelete(i)}>🗑️</button>
+						</Fragment>
+					))}
+				</div>
+			</div>
+		</>
+	)
 }
 
 export default App
