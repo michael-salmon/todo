@@ -7,6 +7,8 @@ import {
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { type todoItem } from './types';
 import './App.css';
+import { Button } from './frags/Button';
+import { Spacer } from './frags/Spacer';
 
 function App() {
 	const { setStorage } = useLocalStorage();
@@ -66,6 +68,7 @@ function App() {
 	return (
 		<div>
 			<h4 className="text-3xl font-bold underline text-center">to-do list | {todoCount}</h4>
+			<Spacer />
 			<input
 				className='border-2 border-white rounded'
 				type='text'
@@ -73,29 +76,30 @@ function App() {
 				onChange={handleTodoUpdate}
 				onKeyDown={onEnter}
 				placeholder=' New Task...' />
-			<button className='mx-2 disabled:bg-gray-500 disabled:cursor-not-allowed'
+			<Button
 				onClick={handleOnClick}
 				disabled={!newTodo.length}>
 				Add ➕
-			</button>
-			<button onClick={handleOnClear} disabled={!doneLength}>Clear Done ➖</button>
-			<div className='my-2' />
+			</Button>
+			<Button onClick={handleOnClear} disabled={!doneLength}>Clear Done ➖</Button>
+			<Spacer />
 			<div className='flex flex-wrap gap-1'>
 				{todoList.map((x, i) => (
-					<div key={i + x.task} className={"max-w-xs p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"}>
+					<div key={i + x.task} className={`max-w-xs p-6 bg-white border border-gray-200 rounded-lg shadow-sm ${x.isDone ? "dark:bg-green-700 dark:border-green-600" : "dark:bg-gray-800 dark:border-gray-700"} overflow-x-auto`}>
+						<div>
+							<Button title={!x.isDone ? `Check` : 'Uncheck'} onClick={handleOnCheck(i)}>
+								{x.isDone ? `✅` : `🔳`}
+							</Button>
+							<Button title='Remove' onClick={handleOnDelete(i)}>
+								🗑️
+							</Button>
+						</div>
+						<Spacer />
 						<span
 							className={`text-wrap m-2 ${x.isDone ? "line-through" : ""}`}
 							onClick={handleOnCheck(i)}>
 							{x.task}
 						</span>
-						<div>
-							<button title={!x.isDone ? `Check` : 'Uncheck'} onClick={handleOnCheck(i)}>
-								{x.isDone ? `✅` : `🔳`}
-							</button>
-							<button title='Remove' className='mx-2' onClick={handleOnDelete(i)}>
-								🗑️
-							</button>
-						</div>
 					</div>
 				))}
 			</div>
@@ -103,4 +107,4 @@ function App() {
 	)
 }
 
-export default App
+export default App;
